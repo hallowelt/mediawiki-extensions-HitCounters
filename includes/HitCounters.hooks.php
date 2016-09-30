@@ -129,6 +129,9 @@ class Hooks {
 			);
 			DeferredUpdates::addUpdate( new SiteStatsUpdate( 1, 0, 0 ) );
 		}
+		if ( $wikipage->getContent() !== null ) {
+			\DataUpdate::runUpdates( $wikipage->getContent()->getSecondaryDataUpdates( $wikipage->getTitle() ) );
+		}
 	}
 
 	public static function onSkinTemplateOutputPageBeforeExec(
