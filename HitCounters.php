@@ -37,6 +37,18 @@
 
 call_user_func(
 	function () {
+		if( !isset( $GLOBALS["bssDefinitions"] ) ){
+			$GLOBALS["bssDefinitions"] = array();
+		}
+		$GLOBALS["bssDefinitions"]["_HITCOUNTERS"] = array(
+			"id" => "___HITCOUNTERS",
+			"type" => 1,
+			"show" => false,
+			"msgkey" => "hitcounters-extensionname",
+			"alias" => "Hit counter",
+			"label" => "HitCounters",
+			"mapping" => "HitCounters\\HitCounters::smwMappingFunction"
+		);
 		if ( function_exists( 'wfLoadExtension' ) ) {
 			wfLoadExtension( 'HitCounters' );
 			wfWarn(

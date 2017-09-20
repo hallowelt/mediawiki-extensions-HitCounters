@@ -25,9 +25,6 @@ class HitCounters {
 	 * @return int The view count for the page
 	 */
 	public static function getCount( Title $title ) {
-		if ( $title === null ) {
-			throw new MWException( "Asked for count without a title!" );
-		}
 		if ( $title->isSpecialPage() ) {
 			return null;
 		}
@@ -131,6 +128,16 @@ class HitCounters {
 					$wgDBprefix . 'page.page_id = ' .
 					$wgDBprefix . 'hit_counter.page_id' )
 			)
+		);
+	}
+
+	public static function smwMappingFunction(
+		\SMW\SemanticData $aSemanticData, \WikiPage $aWikiPage, \SMW\DIProperty $aProperty
+	) {
+		$intCount = ( int ) self::getCount( $aWikiPage->getTitle() );
+		//add data finally
+		$aSemanticData->addPropertyObjectValue(
+			$aProperty, new \SMWDINumber( $intCount )
 		);
 	}
 }

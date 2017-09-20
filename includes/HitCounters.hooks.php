@@ -25,10 +25,6 @@ use User;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Hooks {
-	public static function onSpecialPage_initList( array &$specialPages ) {
-		$specialPages['PopularPages'] = 'HitCounters\SpecialPopularPages';
-	}
-
 	public static function onLoadExtensionSchemaUpdates(
 		DatabaseUpdater $updater
 	) {
@@ -128,6 +124,9 @@ class Hooks {
 				new ViewCountUpdate( $wikipage->getId() )
 			);
 			DeferredUpdates::addUpdate( new SiteStatsUpdate( 1, 0, 0 ) );
+		}
+		if ( $wikipage->getContent() !== null ) {
+			\DataUpdate::runUpdates( $wikipage->getContent()->getSecondaryDataUpdates( $wikipage->getTitle() ) );
 		}
 	}
 
