@@ -130,4 +130,14 @@ class HitCounters {
 			)
 		);
 	}
+
+	public static function smwMappingFunction(
+		\SMW\SemanticData $aSemanticData, \WikiPage $aWikiPage, \SMW\DIProperty $aProperty
+	) {
+		$intCount = ( int ) self::getCount( $aWikiPage->getTitle() );
+		//add data finally
+		$aSemanticData->addPropertyObjectValue(
+			$aProperty, new \SMWDINumber( $intCount )
+		);
+	}
 }
