@@ -6,7 +6,6 @@ use Title;
 use Parser;
 use PPFrame;
 use MWNamespace;
-use MWException;
 
 class HitCounters {
 	protected static $mViews;
@@ -41,11 +40,11 @@ class HitCounters {
 			var_export( $views, true ) . " from cache" );
 
 		if ( !$views || $views == 1 ) {
-			$dbr = wfGetDB( DB_SLAVE );
+			$dbr = wfGetDB( DB_REPLICA );
 			$row = $dbr->select(
-				array( 'hit_counter' ),
-				array( 'hits' => 'page_counter' ),
-				array( 'page_id' => $title->getArticleID() ),
+				[ 'hit_counter' ],
+				[ 'hits' => 'page_counter' ],
+				[ 'page_id' => $title->getArticleID() ],
 				__METHOD__ );
 
 			if ( $row !== false && $current = $row->current() ) {
@@ -71,7 +70,7 @@ class HitCounters {
 				. ": got " . var_export( self::$mViews, true ) .
 				" from cache." );
 			if ( !self::$mViews || self::$mViews == 1 ) {
-				$dbr = wfGetDB( DB_SLAVE );
+				$dbr = wfGetDB( DB_REPLICA );
 				self::$mViews = $dbr->selectField(
 					'hit_counter', 'SUM(page_counter)', '', __METHOD__
 				);
@@ -93,7 +92,7 @@ class HitCounters {
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public static function numberOfViews(
-		Parser &$parser, PPFrame $frame, $args
+		Parser $parser, PPFrame $frame, $args
 	) {
 		return self::views();
 	}
@@ -104,7 +103,7 @@ class HitCounters {
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public static function numberOfPageViews(
-		Parser &$parser, PPFrame $frame, $args
+		Parser $parser, PPFrame $frame, $args
 	) {
 		return self::getCount( $frame->title );
 	}
@@ -112,23 +111,23 @@ class HitCounters {
 	public static function getQueryInfo() {
 		global $wgDBprefix;
 
-		return array(
-			'tables' => array( 'page', 'hit_counter' ),
-			'fields' => array(
+		return [
+			'tables' => [ 'page', 'hit_counter' ],
+			'fields' => [
 				'namespace' => 'page_namespace',
 				'title' => 'page_title',
-				'value' => 'page_counter' ),
-			'conds' => array(
+				'value' => 'page_counter' ],
+			'conds' => [
 				'page_is_redirect' => 0,
 				'page_namespace' => MWNamespace::getContentNamespaces(),
-			),
-			'join_conds' => array(
-				'page' => array(
+			],
+			'join_conds' => [
+				'page' => [
 					'INNER JOIN',
 					$wgDBprefix . 'page.page_id = ' .
-					$wgDBprefix . 'hit_counter.page_id' )
-			)
-		);
+					$wgDBprefix . 'hit_counter.page_id' ]
+			]
+		];
 	}
 
 	public static function smwMappingFunction(
